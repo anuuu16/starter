@@ -1,0 +1,9 @@
+{
+  "hello": "Hello",
+  "welcome": "Welcome, {name}",
+  "errors": {
+    "notFound": "Resource not found",
+    "unauthorized": "You are not authorized",
+    "validation": "The submitted data is invalid"
+  }
+}

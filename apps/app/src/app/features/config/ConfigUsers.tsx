@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Card, DataTable } from '@org/ui';
+import { useServerTable, type ServerTableParams } from '@org/hooks';
 import { toast } from 'sonner';
 import { apiGet, apiSend } from './_api';
 
@@ -15,36 +16,72 @@ interface UserRow {
   createdAt: string;
 }
 
+interface UsersResponse {
+  users: UserRow[];
+  total: number;
+}
+
 export function ConfigUsers() {
   const { t } = useTranslation();
-  const [users, setUsers] = useState<UserRow[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  const refresh = useCallback(
-    () =>
-      apiGet<{ users: UserRow[] }>('/admin/users')
-        .then((r) => setUsers(r.users ?? []))
-        .catch(() => toast.error(t('config.users.loadError', 'Failed to load users')))
-        .finally(() => setLoading(false)),
-    [t],
-  );
+  const fetchUsers = useCallback((p: ServerTableParams) => {
+    const params = new URLSearchParams({
+      page: String(p.page),
+      limit: String(p.pageSize),
+    });
+    if (p.q) params.set('q', p.q);
+    if (p.sort) {
+      params.set('sort', p.sort.key);
+      params.set('dir', p.sort.dir);
+    }
+    return apiGet<UsersResponse>(`/admin/users?${params.toString()}`).then((r) => ({
+      rows: r.users ?? [],
+      total: r.total ?? 0,
+    }));
+  }, []);
+
+  const table = useServerTable<UserRow>(fetchUsers, { pageSize: 20 });
+  const { reload, error } = table;
 
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    if (error) toast.error(t('config.users.loadError', 'Failed to load users'));
+  }, [error, t]);
 
   const toggleRole = useCallback(
     async (id: string, role: string) => {
       const next = role === 'admin' ? 'user' : 'admin';
       try {
         await apiSend(`/admin/users/${id}/role`, 'PATCH', { role: next });
-        setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, role: next } : u)));
-        toast.success(t('config.users.roleUpdated', 'Role updated to {{role}}', { role: next }));
+        toast.success(
+          t('config.users.roleUpdated', 'Role updated to {{role}}', { role: next }),
+        );
+        reload();
       } catch {
         toast.error(t('config.users.roleFailed', 'Failed to update role'));
       }
     },
-    [t],
+    [t, reload],
+  );
+
+  const removeUser = useCallback(
+    async (id: string, name: string) => {
+      if (
+        !window.confirm(
+          t('config.users.deleteConfirm', 'Delete {{name}}? This cannot be undone.', {
+            name,
+          }),
+        )
+      )
+        return;
+      try {
+        await apiSend(`/admin/users/${id}`, 'DELETE');
+        toast.success(t('config.users.deleted', 'User deleted'));
+        reload();
+      } catch {
+        toast.error(t('config.users.deleteFailed', 'Failed to delete user'));
+      }
+    },
+    [t, reload],
   );
 
   const columns = useMemo(
@@ -91,18 +128,26 @@ export function ConfigUsers() {
         header: t('config.users.col.actions', 'Actions'),
         pinned: 'right' as const,
         cell: (u: UserRow) => (
-          <Button size="sm" variant="ghost" onClick={() => toggleRole(u.id, u.role)}>
-            {u.role === 'admin'
-              ? t('config.users.demote', 'Demote')
-              : t('config.users.promote', 'Promote')}
-          </Button>
+          <div className="flex justify-end gap-1">
+            <Button size="sm" variant="ghost" onClick={() => toggleRole(u.id, u.role)}>
+              {u.role === 'admin'
+                ? t('config.users.demote', 'Demote')
+                : t('config.users.promote', 'Promote')}
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-error hover:text-error"
+              onClick={() => removeUser(u.id, u.name)}
+            >
+              {t('common.delete', 'Delete')}
+            </Button>
+          </div>
         ),
       },
     ],
-    [t, toggleRole],
+    [t, toggleRole, removeUser],
   );
-
-  if (loading) return <p className="text-foreground/60">{t('common.loading', 'Loading…')}</p>;
 
   return (
     <Card className="rounded-xl p-6">
@@ -110,9 +155,10 @@ export function ConfigUsers() {
         {t('config.users.title', 'Users')}
       </h2>
       <DataTable
-        data={users}
+        data={table.rows}
         columns={columns}
         rowKey={(u) => u.id}
+        server={table.server}
         search={(u) => `${u.name} ${u.email} ${u.username}`}
         searchPlaceholder={t('config.users.search', 'Search users…')}
         tableId="config-users"

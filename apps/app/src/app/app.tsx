@@ -43,6 +43,8 @@ const ConfigMailLogs = lazyNamed(() => import('./features/config/ConfigMailLogs'
 const ConfigNotifications = lazyNamed(() => import('./features/config/ConfigNotifications'), 'ConfigNotifications');
 const ConfigVerification = lazyNamed(() => import('./features/config/ConfigVerification'), 'ConfigVerification');
 const ConfigLookups = lazyNamed(() => import('./features/config/ConfigLookups'), 'ConfigLookups');
+const ConfigLookupForm = lazyNamed(() => import('./features/config/ConfigLookupForm'), 'ConfigLookupForm');
+const ConfigLookupDetail = lazyNamed(() => import('./features/config/ConfigLookupDetail'), 'ConfigLookupDetail');
 const ConfigSettings = lazyNamed(() => import('./features/config/ConfigSettings'), 'ConfigSettings');
 const ConfigStorage = lazyNamed(() => import('./features/config/ConfigStorage'), 'ConfigStorage');
 const ConfigQueues = lazyNamed(() => import('./features/config/ConfigQueues'), 'ConfigQueues');
@@ -84,8 +86,17 @@ export function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/referrals" element={<Referrals />} />
+        </Route>
 
-          <Route path="/config" element={<ConfigLayout />}>
+        {/* Standalone full-width admin dashboard (own collapsible sidebar shell). */}
+        <Route
+          element={
+            <ProtectedRoute>
+              <ConfigLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/config">
             <Route index element={<ConfigOverview />} />
             <Route path="users" element={<ConfigUsers />} />
             <Route path="plans" element={<ConfigPlans />} />
@@ -94,7 +105,12 @@ export function App() {
             <Route path="mail-logs" element={<ConfigMailLogs />} />
             <Route path="notifications" element={<ConfigNotifications />} />
             <Route path="verification" element={<ConfigVerification />} />
-            <Route path="lookups" element={<ConfigLookups />} />
+            <Route path="lookups">
+              <Route index element={<ConfigLookups />} />
+              <Route path="new" element={<ConfigLookupForm />} />
+              <Route path=":key" element={<ConfigLookupDetail />} />
+              <Route path=":key/edit" element={<ConfigLookupForm />} />
+            </Route>
             <Route path="settings" element={<ConfigSettings />} />
             <Route path="storage" element={<ConfigStorage />} />
             <Route path="queues" element={<ConfigQueues />} />

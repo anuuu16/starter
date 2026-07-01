@@ -10,13 +10,9 @@
   },
   "common": {
     "admin": "Administrador",
-    "cancel": "Cancelar",
     "confirm": "Confirmar",
     "dashboard": "Panel",
-    "delete": "Eliminar",
-    "loading": "Cargando...",
     "logout": "Cerrar sesión",
-    "save": "Guardar",
     "settings": "Configuración",
     "sign_in": "Iniciar sesión",
     "sign_up": "Registrarse"

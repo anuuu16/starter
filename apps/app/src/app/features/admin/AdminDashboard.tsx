@@ -66,7 +66,7 @@ export function AdminDashboard() {
   };
 
   const deleteUser = async (userId: string) => {
-    if (!confirm('Are you sure? This cannot be undone.')) return;
+    if (!window.confirm('Are you sure? This cannot be undone.')) return;
     try {
       await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
         method: 'DELETE',

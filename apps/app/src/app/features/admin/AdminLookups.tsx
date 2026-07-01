@@ -95,7 +95,7 @@ export function AdminLookups() {
   };
 
   const deleteValue = async (valueId: string) => {
-    if (!confirm('Delete this value?')) return;
+    if (!window.confirm('Delete this value?')) return;
     try {
       await fetch(`${API_BASE_URL}/lookups/values/${valueId}`, {
         method: 'DELETE',

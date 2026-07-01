@@ -10,13 +10,9 @@
   },
   "common": {
     "admin": "Admin",
-    "cancel": "Cancel",
     "confirm": "Confirm",
     "dashboard": "Dashboard",
-    "delete": "Delete",
-    "loading": "Loading...",
     "logout": "Logout",
-    "save": "Save",
     "settings": "Settings",
     "sign_in": "Sign in",
     "sign_up": "Sign up"

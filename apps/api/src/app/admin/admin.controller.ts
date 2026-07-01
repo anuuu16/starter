@@ -46,11 +46,20 @@ export class AdminController {
   }
 
   @Get('users')
-  @ApiOperation({ summary: 'List all users (paginated)' })
-  getUsers(@Query('page') page?: string, @Query('limit') limit?: string) {
+  @ApiOperation({ summary: 'List all users (paginated, searchable, sortable)' })
+  getUsers(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('q') q?: string,
+    @Query('sort') sort?: string,
+    @Query('dir') dir?: string,
+  ) {
     return this.adminService.getUsers(
       parsePositiveInt(page, 1),
       parsePositiveInt(limit, 20, 100),
+      q?.trim() || undefined,
+      sort,
+      dir === 'asc' ? 'asc' : 'desc',
     );
   }
 

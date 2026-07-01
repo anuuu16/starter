@@ -1,4 +1,285 @@
 {
+  "common": {
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading…",
+    "no": "No",
+    "save": "Save",
+    "sending": "Sending…",
+    "yes": "Yes"
+  },
+  "config": {
+    "aiUsage": {
+      "calls": "Calls",
+      "col": {
+        "cost": "Cost (USD)",
+        "model": "Model",
+        "operation": "Operation",
+        "provider": "Provider",
+        "status": "Status",
+        "tokens": "Tokens (in/out)",
+        "when": "When"
+      },
+      "loadError": "Failed to load AI usage",
+      "search": "Search usage…",
+      "subtitle": "Token consumption and cost across providers.",
+      "title": "AI usage",
+      "tokens": "Tokens",
+      "totalCost": "Cost (USD)"
+    },
+    "backToApp": "Back to app",
+    "brand": "Admin",
+    "denied": {
+      "body": "You need admin privileges to view this page.",
+      "title": "Access denied"
+    },
+    "lookups": {
+      "col": {
+        "actions": "Actions",
+        "key": "Key",
+        "name": "Name",
+        "values": "Values",
+        "visibility": "Visibility"
+      },
+      "created": "Group created",
+      "deleteConfirm": "Delete \"{{name}}\" and all its values? This cannot be undone.",
+      "deleted": "Group deleted",
+      "deleteFailed": "Failed to delete group",
+      "editTitle": "Edit group",
+      "empty": "No lookup groups yet. Create one to get started.",
+      "field": {
+        "description": "Description",
+        "descriptionHint": "Optional",
+        "isPublic": "Publicly readable",
+        "key": "Key",
+        "name": "Name"
+      },
+      "groupLoadError": "Failed to load group",
+      "loadError": "Failed to load lookups",
+      "new": "New group",
+      "newTitle": "New lookup group",
+      "notFound": "Group not found",
+      "private": "Private",
+      "public": "Public",
+      "saved": "Group saved",
+      "saveFailed": "Failed to save group",
+      "search": "Search groups…",
+      "title": "Lookups",
+      "value": {
+        "active": "Active",
+        "add": "Add value",
+        "added": "Value added",
+        "addTitle": "Add value",
+        "deleteConfirm": "Delete value \"{{label}}\"?",
+        "deleted": "Value deleted",
+        "deleteFailed": "Failed to delete value",
+        "editTitle": "Edit value",
+        "empty": "No values yet.",
+        "label": "Label",
+        "order": "Order",
+        "saved": "Value saved",
+        "saveFailed": "Failed to update value",
+        "search": "Search values…",
+        "title": "Values",
+        "value": "Value"
+      }
+    },
+    "mailLogs": {
+      "col": {
+        "attempts": "Attempts",
+        "status": "Status",
+        "subject": "Subject",
+        "template": "Template",
+        "to": "To",
+        "when": "When"
+      },
+      "loadError": "Failed to load mail logs",
+      "search": "Search mail logs…",
+      "title": "Mail logs"
+    },
+    "notifications": {
+      "bodyPlaceholder": "Body…",
+      "failed": "Failed to send broadcast",
+      "linkPlaceholder": "Link (optional, e.g. /dashboard)",
+      "required": "Title and body are required",
+      "send": "Send broadcast",
+      "sent": "Broadcast sent to {{n}} users",
+      "subtitle": "Sends an in-app notification + Web Push to every user.",
+      "title": "Broadcast notification",
+      "titlePlaceholder": "Title"
+    },
+    "overview": {
+      "activeWallets": "Active wallets",
+      "payments": "Payments",
+      "subtitle": "Quick health snapshot. Use the sidebar to manage each module.",
+      "title": "Admin overview",
+      "users": "Users"
+    },
+    "payments": {
+      "col": {
+        "amount": "Amount",
+        "date": "Date",
+        "gateway": "Gateway",
+        "id": "ID",
+        "status": "Status"
+      },
+      "loadError": "Failed to load payments",
+      "search": "Search payments…",
+      "title": "Payments"
+    },
+    "plans": {
+      "col": {
+        "active": "Active",
+        "interval": "Interval",
+        "name": "Name",
+        "price": "Price",
+        "type": "Type"
+      },
+      "create": "Create",
+      "created": "Plan created",
+      "createFailed": "Failed to create plan",
+      "draft": "Draft",
+      "live": "Live",
+      "loadError": "Failed to load plans",
+      "new": "New plan",
+      "placeholders": {
+        "currency": "Currency",
+        "name": "Plan name",
+        "price": "Price (cents)"
+      },
+      "search": "Search plans…",
+      "title": "Plans"
+    },
+    "queues": {
+      "available": "Available",
+      "disabled": "Disabled (no REDIS_URL)",
+      "loadError": "Failed to load queues",
+      "recentJobs": "Recent jobs",
+      "subtitle": "BullMQ queue counts and recent jobs. Requires REDIS_URL.",
+      "title": "Queues"
+    },
+    "referrals": {
+      "col": {
+        "actions": "Actions",
+        "code": "Code",
+        "referred": "Referred",
+        "referrer": "Referrer",
+        "status": "Reward",
+        "when": "When"
+      },
+      "empty": "No referrals yet.",
+      "loadError": "Failed to load referrals",
+      "markAwarded": "Mark awarded",
+      "rewarded": "Marked as awarded",
+      "rewardFailed": "Failed to mark as awarded",
+      "search": "Search referrals…",
+      "title": "Referrals"
+    },
+    "settings": {
+      "col": {
+        "key": "Key",
+        "notes": "Notes",
+        "scope": "Scope",
+        "value": "Value"
+      },
+      "keyPlaceholder": "key.with.dots",
+      "loadError": "Failed to load settings",
+      "notesPlaceholder": "Notes (optional)",
+      "saved": "Saved",
+      "saveFailed": "Failed to save",
+      "search": "Search settings…",
+      "title": "Settings",
+      "upsert": "Upsert setting",
+      "valuePlaceholder": "JSON value or string"
+    },
+    "storage": {
+      "col": {
+        "actions": "Actions",
+        "key": "Key",
+        "modified": "Modified",
+        "size": "Size"
+      },
+      "delete": "Delete",
+      "deleted": "Deleted",
+      "deleteFailed": "Delete failed",
+      "empty": "No files.",
+      "loadError": "Failed to list files",
+      "prefixPlaceholder": "Prefix (e.g. uploads/)",
+      "refresh": "Refresh",
+      "search": "Search files…",
+      "title": "Storage browser"
+    },
+    "title": "Admin console",
+    "users": {
+      "col": {
+        "actions": "Actions",
+        "email": "Email",
+        "name": "Name",
+        "provider": "Provider",
+        "role": "Role"
+      },
+      "deleteConfirm": "Delete {{name}}? This cannot be undone.",
+      "deleted": "User deleted",
+      "deleteFailed": "Failed to delete user",
+      "demote": "Demote",
+      "loadError": "Failed to load users",
+      "promote": "Promote",
+      "roleFailed": "Failed to update role",
+      "roleUpdated": "Role updated to {{role}}",
+      "search": "Search users…",
+      "title": "Users"
+    },
+    "verification": {
+      "approve": "Approve",
+      "approved": "Approved",
+      "col": {
+        "actions": "Actions",
+        "evidence": "Evidence",
+        "kind": "Kind",
+        "user": "User",
+        "when": "When"
+      },
+      "decideFailed": "Decision failed",
+      "empty": "Nothing pending.",
+      "loadError": "Failed to load queue",
+      "reasonPlaceholder": "Reason (if rejecting)",
+      "reasonRequired": "A reason is required to reject",
+      "reject": "Reject",
+      "rejected": "Rejected",
+      "search": "Search queue…",
+      "title": "Verification queue"
+    }
+  },
+  "nav": {
+    "admin": "Admin",
+    "adminConsole": "Admin console",
+    "dashboard": "Dashboard",
+    "logout": "Logout",
+    "referrals": "Referrals",
+    "settings": "Settings"
+  },
+  "referrals": {
+    "awarded": "Awarded",
+    "copied": "Copied to clipboard",
+    "copyCode": "Copy code",
+    "copyLink": "Copy link",
+    "empty": "No referrals yet. Share your code!",
+    "invited": "Invited",
+    "list": {
+      "email": "Email",
+      "joined": "Joined",
+      "name": "Name",
+      "reward": "Reward",
+      "title": "People you referred"
+    },
+    "loadError": "Failed to load referrals",
+    "pending": "Pending reward",
+    "shareLink": "Share link",
+    "subtitle": "Share your code. We track every signup that comes from you.",
+    "title": "Refer & earn",
+    "yourCode": "Your code"
+  },
   "settings": {
     "language": "Language",
     "theme": "Theme"

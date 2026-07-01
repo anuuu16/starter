@@ -1,6 +1,13 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import {
+  AcceptLanguageResolver,
+  HeaderResolver,
+  I18nModule,
+  QueryResolver,
+} from 'nestjs-i18n';
+import { join } from 'path';
 import { AdminModule } from './admin/admin.module';
 import { AiModule } from './ai/ai.module';
 import { AiUsageModule } from './ai-usage/ai-usage.module';
@@ -37,6 +44,22 @@ import { WebhooksModule } from './webhooks/webhooks.module';
   imports: [
     AppConfigModule,
     AppLoggerModule,
+    // Server-side i18n. Locale files live in src/assets/i18n/<lng>/*.json and are
+    // copied to dist/apps/api/assets/i18n by the webpack `assets` glob, so
+    // __dirname (the bundle dir) + /assets/i18n resolves in dev and prod alike.
+    // Language is resolved from ?lang=, the `x-lang` header, or Accept-Language.
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      loaderOptions: {
+        path: join(__dirname, '/assets/i18n/'),
+        watch: true,
+      },
+      resolvers: [
+        { use: QueryResolver, options: ['lang'] },
+        new HeaderResolver(['x-lang']),
+        AcceptLanguageResolver,
+      ],
+    }),
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 120 }]),
     DatabaseModule,
     MailModule.forRootAsync(),

@@ -2,6 +2,43 @@
 
 Append-only record of phases that land. Newest at the top.
 
+## 2026-07-01 — Backend i18n + server-side CRUD tables (users, lookups)
+
+Two things: (1) added server-side i18n and (2) built the reusable server-paginated CRUD pattern, converting the flagship tables. The frontends already had react-i18next (app) + locale routing (web); the DataTable already had a server-driven mode — but **no page used it** and there was no reusable pagination infra.
+
+### Server-side i18n (backend) — runtime-verified
+- Added `nestjs-i18n`. `I18nModule.forRoot` in `app.module.ts` resolves language from `?lang=`, `x-lang` header, or `Accept-Language` (fallback `en`). Locale files live in `apps/api/src/assets/i18n/<lng>/common.json` (en + hi) and ride the existing webpack `assets` glob into `dist/apps/api/assets/i18n`, so `join(__dirname,'/assets/i18n/')` resolves in dev and prod.
+- Demo: `GET /api/i18n-demo` (marked `@Public()`). Verified on a built instance: `?lang=hi` → `{"lang":"hi","hello":"नमस्ते",...}`, default → English, `x-lang: hi` header → Hindi. Interpolation (`welcome`) works.
+
+### Reusable server-table infra
+- `@org/hooks` → **`useServerTable`**: owns page (0-based, matches DataTable's TanStack `pageIndex`)/pageSize/debounced-query/sort, guards out-of-order responses, exposes a `server` binding for `<DataTable server={…} />` + `reload()`. `fetcher` receives 1-based `page` (natural for APIs) and returns `{ rows, total }`. This is the repeatable recipe for converting any large table.
+
+### Users table — full server-side
+- Backend `AdminService.getUsers` gained case-insensitive search (`q` across name/email/username) + allow-listed sort (`name|email|username|role|createdAt`) + dir; controller passes `q/sort/dir` (response shape unchanged → AdminDashboard still works).
+- `ConfigUsers` rewritten onto `useServerTable` + DataTable server mode (server paging/search/sort) with role toggle + delete.
+
+### Lookups — full CRUD + server-paginated list
+- Backend: `getGroupsPaginated` (search/sort + value counts) at `GET /lookups/admin/groups`; group detail `GET /lookups/admin/group/:key` (incl. inactive values); group `PATCH/DELETE :id` (delete cascades values). Value CRUD already existed.
+- DTOs in the shared lib: `libs/shared/dto/src/lib/lookup/*` (create/update group + value zod schemas), exported from `@org/dto`.
+- Frontend pages (routes under `/config/lookups`): list (server table + New) → `/config/lookups`; create/edit group form (RHF + zodResolver + `@org/dto`) → `/new` & `/:key/edit`; group detail with a values CRUD table + add/edit dialog + toggle-active + delete → `/:key`. Replaces the old `AdminLookups` embed. `app.tsx` routes nested accordingly.
+
+### i18n extraction
+- Ran `pnpm i18n:extract`: app `translation.json` went 11 → 291 lines across en/es/fr/de/hi (new `config.lookups.*`, `config.users.*`, etc.). Non-English frontend locales hold English placeholders (real human/pro translation is separate content work; the `hi` **backend** strings are real Hindi).
+
+### Verification
+- `@org/app:typecheck` PASS; `@org/api` webpack build PASS (i18n assets copied); lint PASS for app/ui/hooks/dto/api (0 errors; pre-existing warnings only); backend i18n runtime-verified. **Not browser-verified:** the new frontend CRUD pages weren't clicked through (Chrome extension offline) — but they typecheck and the endpoints they call are verified.
+
+## 2026-07-01 — Collapsible sidebar dashboard shell (app + admin)
+
+Added a reusable, accessible, collapsible left-sidebar shell and adopted it across the React dashboard (`apps/app`). Previously `MainLayout` was a top-bar + avatar dropdown and the admin `/config` area used a static (non-collapsible) nav card crammed into a narrow `max-w-5xl` column.
+
+- **`@org/ui` — `sidebar.tsx`** (new): composable primitives — `SidebarProvider`/`useSidebar` (collapse state persisted to `localStorage` key `sidebar:collapsed`), `Sidebar` (desktop rail, animates `w-64` ↔ `w-[4.5rem]`, hidden below `lg`), `SidebarMobile` (left `Sheet` drawer for `<lg`, forces labels visible, closes on link tap), `SidebarHeader`/`SidebarContent`/`SidebarFooter`/`SidebarGroup` (optional label), `SidebarItem` (router-agnostic — injects icon+label into a passed `<NavLink>` via `cloneElement`; shows a right-side tooltip when collapsed), `SidebarTrigger` (mobile hamburger) + `SidebarCollapseButton` (desktop toggle). Exported from the barrel. New dep: `lucide-react` (first icon library in the repo).
+- **`MainLayout`** rebuilt as the sidebar app shell — brand, primary nav (Dashboard/Referrals/Settings), conditional Admin group, sticky topbar (mobile trigger + `ThemeSwitcher`), footer user menu (avatar + `DropdownMenu`: Settings/Admin/Logout).
+- **`ConfigLayout`** upgraded to a **standalone full-width admin dashboard** with the same collapsible sidebar, grouped nav (Overview / People / Billing / Comms & AI / System) with icons, back-to-app + user menu footer. Pulled `/config/*` out of the `MainLayout` parent route in `app.tsx` into its own `ProtectedRoute` so it renders as its own shell (no nested sidebars). Admin role gate preserved. All strings `t('key','English')`.
+- Pre-existing lint errors greened up (global `confirm` → `window.confirm` in `AdminDashboard.tsx`/`AdminLookups.tsx`).
+- Verified: `@org/app:typecheck` PASS; `@org/app` + `@org/ui` lint PASS (only pre-existing warnings, none in new code); vite dev server compiles all new modules incl. `lucide-react` re-optimization with no errors. Browser extension unavailable → no runtime screenshot.
+- Note: RHF+zod+`@org/dto` forms and the referral feature the request also mentioned already existed — this phase was purely the missing sidebar/dashboard shell.
+
 ## 2026-07-01 — Referrals + seed users + webhooks-no-redis boot fix
 
 - **`referrals` module** — new `Referral` Prisma model + migration `referrals`. `ReferralsService.getMyCode(userId)` lazily assigns a stable 8-char code per user; `attachReferred(code, referredUserId)` links a signup to its referrer (idempotent + rejects self-referral). Stats + admin list + `markRewarded(id, metadata?)` hook. UI: `/referrals` (per-user share + stats) and `/config/referrals` (admin list + mark-awarded). Reward decision is left to the consuming project — boilerplate tracks status only. Docs in `docs/modules/referrals.md`. Index updated.

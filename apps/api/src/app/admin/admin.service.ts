@@ -20,13 +20,38 @@ export class AdminService {
     }
   }
 
-  async getUsers(page = 1, limit = 20) {
+  async getUsers(
+    page = 1,
+    limit = 20,
+    q?: string,
+    sort?: string,
+    dir: 'asc' | 'desc' = 'desc',
+  ) {
     const skip = (page - 1) * limit;
+
+    // Case-insensitive contains search across the human-facing identifiers.
+    const where = q
+      ? {
+          OR: [
+            { name: { contains: q, mode: 'insensitive' as const } },
+            { email: { contains: q, mode: 'insensitive' as const } },
+            { username: { contains: q, mode: 'insensitive' as const } },
+          ],
+        }
+      : {};
+
+    // Allow-list sortable columns so the query param can't reach arbitrary fields.
+    const SORTABLE = ['name', 'email', 'username', 'role', 'createdAt'] as const;
+    const sortField = (SORTABLE as readonly string[]).includes(sort ?? '')
+      ? (sort as (typeof SORTABLE)[number])
+      : 'createdAt';
+
     const [users, total] = await Promise.all([
       this.db.user.findMany({
+        where,
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { [sortField]: dir },
         select: {
           id: true,
           name: true,
@@ -38,7 +63,7 @@ export class AdminService {
           createdAt: true,
         },
       }),
-      this.db.user.count(),
+      this.db.user.count({ where }),
     ]);
     return { users, total, page, limit, pages: Math.ceil(total / limit) };
   }
